@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import {Fragment, useEffect, useMemo, useState } from "react";
 import { getDadosPorMesAno, atualizarRegistroSupabase } from "../servicos/TesourariaServicos";
 
 
@@ -191,31 +191,47 @@ export function DetalhesTesouraria() {
                                     </tr>
                                     </thead>
                                     
-                                    <tbody className="divide-y divide-gray-800">
+                                    <tbody>
                                         {dados.map((item) => (
-                                            <tr key={item.id} className="hover:bg-gray-800 transition-colors select-none" // o select-none não permite a seleção de componentes na tela
-                                            onDoubleClick={() => setEdicaoItem(item)} //Passa o array do item clicado para a variável edicaoItem
-                                            >
-                                                <td className="px-2 sm:px-4 py-3 sm:py-4 text-gray-200 whitespace-nowrap">                
-                                                    {new Date(item.data.replace('-', '/')).toLocaleDateString('pt-BR', {
-                                                        day: '2-digit',
-                                                        month: '2-digit',
-                                                        year: '2-digit'
-                                                    })}
-                                                </td>
-                                                <td className="px-2 sm:px-4 py-3 sm:py-4 text-gray-200 text-right">
-                                                    R$ {(item.entrada_pix || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                                </td>
-                                                <td className="px-2 sm:px-4 py-3 sm:py-4 text-gray-200 text-right">
-                                                    R$ {(item.entrada_e || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                                </td>
-                                                <td className={`px-2 sm:px-4 py-3 sm:py-4 font-bold text-right ${
-                                                    item.desconsiderar ? 'text-amber-600' : 'text-emerald-300'
-                                                }`}>
-                                                    R$ {(item.valor_total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                                    </td>    
-                                                                                     
-                                            </tr>
+                                            //Como será necessário retomar o mesmo id em duas linhas, vamos envolver a ambas pelo Fragment, outra biblioteca:
+                                            <Fragment key={item.id}>
+                                                {/* key={item.id}, como passamos a key para o elemento pai, não é mais necessário está vinculado a tr, que antes era o elemento pai*/}
+                                                <tr className="hover:bg-gray-800 border-t border-gray-800 select-none" // o select-none não permite a seleção de componentes na tela
+                                                onDoubleClick={() => setEdicaoItem(item)} //Passa o array do item clicado para a variável edicaoItem
+                                                >
+                                                    <td className="px-2 sm:px-4 py-3 sm:py-4 text-gray-200 whitespace-nowrap">                
+                                                        {new Date(item.data.replace('-', '/')).toLocaleDateString('pt-BR', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: '2-digit'
+                                                        })}
+                                                    </td>
+                                                    <td className="px-2 sm:px-4 py-3 sm:py-4 text-gray-200 text-right">
+                                                        R$ {(item.entrada_pix || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                    </td>
+                                                    <td className="px-2 sm:px-4 py-3 sm:py-4 text-gray-200 text-right">
+                                                        R$ {(item.entrada_e || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                    </td>
+                                                    <td className={`px-2 sm:px-4 py-3 sm:py-4 font-bold text-right ${
+                                                        item.desconsiderar ? 'text-amber-600' : 'text-emerald-300'
+                                                    }`}>
+                                                        R$ {(item.valor_total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                                                        </td>                                                                                      
+                                                </tr>
+
+                                                {/*Aqui a linha só vai renderizar se contiver informações no banco de dados*/}
+                                                {item.observacao && (
+                                                    <tr>
+                                                        <td
+                                                            className="pt-0 pb-2 pl-4 text-gray-400"
+                                                            colSpan={4}
+                                                        >
+                                                            {item.observacao}
+                                                        </td>
+                                                    </tr>
+                                                )}
+
+                                            </Fragment>
                                         ))}                                    
                                     </tbody>
                                 </table>
@@ -456,10 +472,10 @@ export function DetalhesTesouraria() {
                                 <select 
                                     className="w-full p-2.5 rounded bg-gray-800 border border-gray-600 text-white focus:border-red-500 focus:outline-none cursor-pointer"
                                     value={edicaoItem.origem || 'conta'}
-                                    onChange={(e) => setEdicaoItem({ ...edicaoItem, origen: e.target.value })} // Ajuste o nome da propriedade se no banco for 'origem' ou 'origen'
+                                    onChange={(e) => setEdicaoItem({ ...edicaoItem, origem: e.target.value })} // Ajuste o nome da propriedade se no banco for 'origem' ou 'origen'
                                 >
                                     <option value="conta">Conta Bancária</option>
-                                    <option value="caixa">Caixa / Espécie</option>
+                                    <option value="especie">Saldo em Espécie</option>
                                 </select>
                                 </div>
 

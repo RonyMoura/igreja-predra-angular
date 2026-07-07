@@ -78,11 +78,17 @@ export default function useSaldos() {
 
         calcularSaldos();
 
-      const desinscrever = subscreverGeral((payload) => {
-        
-        if (payload.eventType === 'INSERT') {
+      
+        //const desinscrever = subscreverGeral((payload) => {
+        const desinscrever = subscreverGeral(() => {  
+          
           calcularSaldos();
-        }
+        
+          /*//FUNÇÃO PARA FILTRAR O TIPO DE EVENTO A SER CONSIDERADO:
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            calcularSaldos();
+          }
+          */
         });
 
       return () => desinscrever(); // Remove a função da lista ao sair da página
