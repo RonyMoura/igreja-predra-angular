@@ -14,6 +14,7 @@ import { Login } from './pages/Login';
 import PainelAdmin from './pages/PainelAdm';
 import CelulaJesusSalva from './pages/CelulaJesusSalva';
 import Tesouraria from './pages/Tesouraria';
+import Secretaria from './pages/Secretaria';
 
 
 function App() {
@@ -34,6 +35,8 @@ function App() {
         <Route path="/painel" element={<PainelAdmin />} />
         <Route path="/celula_js" element={<CelulaJesusSalva />} />
         <Route path="/tesouraria" element={<Tesouraria />} />
+        <Route path="/secretaria" element={<Secretaria />} />
+
         </Routes>
     </Router>
   );

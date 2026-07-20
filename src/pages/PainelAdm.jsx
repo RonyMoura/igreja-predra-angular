@@ -76,7 +76,7 @@ export default function PainelAdmin() {
             <span className="absolute top-4 right-4 text-[10px] text-zinc-600 font-bold uppercase border border-zinc-800 px-2 py-1 rounded">Restrito</span>
           </button>
 
-          {/* Botão: Tesouraria (EM BREVE / PROTEGIDO) */}
+          {/* Botão: Tesouraria (PROTEGIDO) */}
           <button 
             onClick={() => acessarAreaRestrita("/tesouraria")}
             className="group bg-zinc-900 border-2 border-zinc-800 p-8 rounded-xl hover:border-amber-500 transition-all text-left shadow-lg relative overflow-hidden"
@@ -89,7 +89,20 @@ export default function PainelAdmin() {
             <p className="text-zinc-400 text-sm leading-relaxed">Gestão financeira, dízimos e ofertas.</p>
           </button>
 
-          {/* Botão: Próximos botões */}
+          {/* Botão: Secretaria (PROTEGIDO) */}
+          <button 
+            onClick={() => acessarAreaRestrita("/secretaria")}
+            className="group bg-zinc-900 border-2 border-zinc-800 p-8 rounded-xl hover:border-amber-500 transition-all text-left shadow-lg relative overflow-hidden"
+          >
+            <div className="bg-amber-500 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:rotate-12 transition-transform">
+              <span className="text-black font-black text-2xl">S</span>
+            </div>
+              <span className="absolute top-4 right-4 text-[10px] text-zinc-600 font-bold uppercase border border-zinc-800 px-2 py-1 rounded">Restrito</span>
+            <h2 className="text-xl font-bold uppercase mb-2 group-hover:text-amber-400 transition-colors">Secretaria</h2>
+            <p className="text-zinc-400 text-sm leading-relaxed">Gestão da membreseia: carteirinhas, cadastros de membros, atas de reuniões...</p>
+          </button>
+
+          {/* Botão: Próxima ferramente - Desativado, pois não haverá a inclusão de mais ferramentas.
             <button 
               onClick={() => acessarAreaRestrita("/montar")}
               className="group bg-zinc-900/50 border-2 border-zinc-800/50 p-8 rounded-xl text-left shadow-lg opacity-60 cursor-help"
@@ -100,6 +113,7 @@ export default function PainelAdmin() {
               <h2 className="text-xl font-bold uppercase mb-2">Próxima ferramenta</h2>
               <p className="text-zinc-500 text-sm">Funcionalidades que serão inseridas futuramente (Bloqueado).</p>
             </button>
+          */}  
 
         </div>
 

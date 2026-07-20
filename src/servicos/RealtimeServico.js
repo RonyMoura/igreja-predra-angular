@@ -20,7 +20,7 @@ export const subscreverMudancasTesouraria = (callback, nomeCanal = 'geral') => {
 */
 
 
-let canalUnico = null;
+let canalTesouraria = null;
 const listeners = new Set(); // Lista de funções que querem receber os dados
 
 const handleChanges = (payload) => {
@@ -32,12 +32,13 @@ export const subscreverGeral = (callback) => {
   listeners.add(callback);
 
   // Se o canal ainda não existe, criamos agora
-  if (!canalUnico) {
-    canalUnico = supabase
+  if (!canalTesouraria) {
+    canalTesouraria = supabase
       .channel('fluxo-caixa-central')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tesouraria_ent' }, handleChanges)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tesouraria_saidas' }, handleChanges)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tesouraria_transf' }, handleChanges)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'cadastro_membros' }, handleChanges)      
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') console.log('Conectado ao canal central!');
       });
@@ -47,5 +48,34 @@ export const subscreverGeral = (callback) => {
   return () => {
     listeners.delete(callback);
     // Opcional: Se listeners.size === 0, você poderia fechar o canalUnico se quiser economizar
+  };
+};
+
+
+let canalSecretaria = null;
+const listenersSecretaria = new Set();
+
+const handleSecretariaChanges = (payload) => {
+  listenersSecretaria.forEach((callback) => callback(payload));  
+};
+
+export const subscreverSecretaria = (callback) => {
+  listenersSecretaria.add(callback);
+
+  if (!canalSecretaria) {
+    canalSecretaria = supabase
+      .channel('realtime-secretaria')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'cadastro_membros' }, handleSecretariaChanges)
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') console.log('Conectado ao canal da secretaria!');
+      });
+  }
+
+  return () => {
+    listenersSecretaria.delete(callback);
+    if (listenersSecretaria.size === 0 && canalSecretaria) {
+      canalSecretaria.unsubscribe();
+      canalSecretaria = null;
+    }
   };
 };

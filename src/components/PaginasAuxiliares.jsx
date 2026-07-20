@@ -3,33 +3,34 @@
 
 import { Link, useLocation, useNavigate } from "react-router-dom"; /*Trata-se de um link de navegação interna*/
 import { supabase } from "../supabaseClient"; /* Importamos o cliente do banco para gerenciar a sessão */
-import { useEffect, useState } from "react"; /* Precisamos disso para checar se o usuário está logado ao carregar a página */
 
-export default function PaginasAuxiliares({destino}) {
+export default function PaginasAuxiliares({destino, sessao}) {
 
   const navigate = useNavigate(); // Cria a função para redirecionar o usuário depois
-  const [usuarioLogado, setUsuarioLogado] = useState(false); // Guarda se existe alguém logado (começa como falso)
-
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession(); // Busca a sessão atual no Supabase
-      setUsuarioLogado(!!session); // Se existir sessão, vira true; se for null, vira false
-    };
-
-    checkUser(); // Executa a verificação assim que o componente carrega
-    }, []);
-
+  
     const handleLogout = async () => {
     await supabase.auth.signOut(); // Diz ao Supabase para encerrar a sessão no navegador
-    setUsuarioLogado(false); // Atualiza o "interruptor" para falso localmente
     navigate("/login2"); // Redireciona o usuário para a página de login imediatamente
     };
 
     //Identificar a página para mudar o letreiro:
     const local = useLocation().pathname;
-    
+        
+    // 1. Define os textos com base na rota atual
+    let titulo = "Igreja Pedra Angular";
+    let subtitulo = "Missão e Reino";
 
-  return (
+    if (local === '/tesouraria') {
+      titulo = "Tesouraria";
+      subtitulo = "Igreja Pedra Angular";
+    } else if (local === '/secretaria') {
+      titulo = "Secretaria";
+      subtitulo = "Igreja Pedra Angular";
+    }   
+    
+    const usuarioLogado = !!sessao
+
+    return (
     <header className="bg-black text-white py-4 px-6 border-b-4 border-amber-500 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto flex items-center justify-between">
         
@@ -42,11 +43,13 @@ export default function PaginasAuxiliares({destino}) {
           />
           <div>
             <h1 className="text-xl font-black uppercase tracking-tighter">
-              {local !== '/tesouraria' ? "Pedra Angular": 'Tesouraria'}
+              {titulo}
             </h1>
+            
             <p className="text-amber-400 text-[10px] font-bold tracking-widest uppercase -mt-1">
-              {local === '/tesouraria'? 'Igreja Pedra Angular':'Missão e Reino'}
-            </p>
+              {subtitulo}
+            </p>            
+            
           </div>
         </div>
 
@@ -73,3 +76,4 @@ export default function PaginasAuxiliares({destino}) {
     </header>
   );
 }
+
