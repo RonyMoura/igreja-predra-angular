@@ -17,7 +17,7 @@ const Secretaria = () => {
     data_nasc: '',
     endereco_resid:'',
     bairro:'',
-    cidade:'São Paulo',
+    cidade:'SÃO PAULO',
     cep:'',
     tel1:'',
     tel2:'',
@@ -29,7 +29,9 @@ const Secretaria = () => {
   const { name, value } = e.target;  
     setFormData((dadosAnteriores) => ({
       ...dadosAnteriores, // Mantém o que já estava digitado nos outros campos
-      [name]: value       // Atualiza apenas o campo que mudou dinamicamente
+      [name]: name === 'nome' ||
+      name === 'endereco_resid' ||
+      name === 'bairro' ? value.toUpperCase() : value // Atualiza apenas o campo que mudou dinamicamente
     }));
     
   };
@@ -40,11 +42,13 @@ const Secretaria = () => {
     e.preventDefault(); // Evita que a página recarregue ao enviar
     
     //Tratamento de dados antes de enviar:
-    if (!formData.nome.trim() || !formData.data_nasc) {
-      alert("⚠️ Dados incompletos. Verique os campos em vermelho");
+    if (!formData.nome.trim() || !formData.data_nasc ||
+      !formData.endereco_resid.trim() || !formData.bairro.trim() ||
+      !formData.cidade.trim() || !formData.tel1.trim()) {
+      alert("⚠️ Dados incompletos. Verique os campos em vermelho.");
       return;
-    }  
-    
+    }
+
     setEnviando(true);
     
     try {
@@ -53,7 +57,7 @@ const Secretaria = () => {
       alert("Membro cadastrado com sucesso!");
       
       // Opcional: Limpar o formulário após salvar
-      setFormData({ nome: '', data_nasc: '', endereco_resid:'', bairro:'', cidade:'São Paulo' }); 
+      setFormData({ nome: '', data_nasc: '', endereco_resid:'', bairro:'', cidade:'São Paulo', tel1:'' }); 
       } catch (error) {
         alert("Erro ao salvar: " + error.message);
       } finally {
@@ -62,7 +66,7 @@ const Secretaria = () => {
       }
     };
 
-
+    
   // Esta referência impede que o código rode mais de uma vez
   const rodouRedirecionamento = useRef(false);
 
@@ -78,12 +82,9 @@ const Secretaria = () => {
     // Só executa se o carregamento terminou, não tem acesso E ainda não rodou esta lógica
     if (!sessao?.carregando && !comAcesso && !rodouRedirecionamento.current) {
       rodouRedirecionamento.current = true; // Bloqueia repetições imediatas
-      console.log(dadosUsuario);
       alert("Acesso negado: Você não tem permissão de Secretário(a).");
       navigate('/painel');
-
       }
-      
       
     const canalSecretaria = subscreverSecretaria();
 
@@ -97,28 +98,40 @@ const Secretaria = () => {
     );
       
   }
-
+  
   return (
   <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col font-sans antialiased">
     <PaginasAuxiliares sessao={sessao.sessao} />
 
     <main className="w-full max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex-1 flex flex-col justify-start">
       
-      <div className="w-full flex justify-center mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full">
+
         <button 
-          onClick={() => setAbaAtiva(abaAtiva === true ? null : true)}
-          className={`w-full sm:w-2/3 md:w-1/2 py-3 px-6 font-black uppercase tracking-wider transition-all duration-300 border-2 rounded-full text-sm sm:text-base cursor-pointer shadow-lg ${
-            abaAtiva === true 
-              ? 'bg-amber-600 border-amber-500 text-white' 
-              : 'border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white'
-          }`}
-        >
-          {abaAtiva === true ? '✕ Fechar' : 'Cadastrar Membro'}
+            onClick={() => setAbaAtiva(abaAtiva === true ? null : true)}
+            className={`w-full sm:w-2/3 md:w-1/2 py-3 px-6 font-black uppercase tracking-wider transition-all duration-300 border-2 rounded-full text-sm sm:text-base cursor-pointer shadow-lg ${
+              abaAtiva === true 
+                ? 'bg-amber-600 border-amber-500 text-white' 
+                : 'border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white'
+            }`}
+          >
+            {abaAtiva === true ? '✕ Fechar' : 'Cadastrar Membro'}
+        </button>
+      
+        <button 
+            onClick={() => setAbaAtiva(abaAtiva === true ? null : true)}
+            className={`w-full sm:w-2/3 md:w-1/2 py-3 px-6 font-black uppercase tracking-wider transition-all duration-300 border-2 rounded-full text-sm sm:text-base cursor-pointer shadow-lg ${
+              abaAtiva === true 
+                ? 'bg-amber-600 border-amber-500 text-white' 
+                : 'border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white'
+            }`}
+          >
+            {abaAtiva === true ? '✕ Fechar' : 'Cadastrar Membro'}
         </button>
       </div>
 
       {abaAtiva === true && (
-        <div className="w-full bg-zinc-900 border border-zinc-800 p-4 sm:p-6 md:p-8 rounded-2xl shadow-2xl transition-all duration-500 animate-in fade-in slide-in-from-top-4">
+        <div className="w-full bg-zinc-900 border border-zinc-800 p-4 sm:p-6 md:p-8 rounded-2xl shadow-2xl transition-all duration-500 animate-in fade-in slide-in-from-top-4 mt-8">
           
           <h3 className="text-xl sm:text-2xl font-black uppercase mb-6 tracking-tight text-amber-500 border-b border-zinc-800 pb-3">
             Novo cadastro
@@ -141,9 +154,11 @@ const Secretaria = () => {
             <div className="col-span-1 flex flex-col gap-1.5">
               <label className="text-xs font-bold uppercase tracking-wide text-zinc-400">Data de Nascimento</label>
               <input
-                className={`w-full bg-black border ${formData.data_nasc === '' ? 'border-red-900' : 'border-emerald-900'} p-3 text-white outline-none transition-colors uppercase rounded-xl text-sm focus:border-amber-500`}
+                className={`w-2/3 md:w-full bg-black border ${formData.data_nasc === '' ? 'border-red-900' : 'border-emerald-900'} p-3 
+                text-white outline-none transition-colors uppercase rounded-xl focus:border-amber-500 invalid:text-zinc-400`}
                 name="data_nasc" 
                 type="date"
+                required //apenas para deixar o texto padrão de data em cinza, em conjunto com o invalid:text-zinc-400
                 value={formData.data_nasc}
                 onClick={(e) => e.target.showPicker()}
                 onChange={handleChange}
@@ -165,7 +180,7 @@ const Secretaria = () => {
             <div className="col-span-1 flex flex-col gap-1.5">
               <label className="text-xs font-bold uppercase tracking-wide text-zinc-400">Bairro</label>
               <input
-                className={`w-full bg-black border ${formData.bairro === '' ? 'border-red-900' : 'border-emerald-900'} p-3 text-white outline-none transition-colors uppercase rounded-xl text-sm focus:border-amber-500`}
+                className={`w-auto bg-black border ${formData.bairro === '' ? 'border-red-900' : 'border-emerald-900'} p-3 text-white outline-none transition-colors uppercase rounded-xl text-sm focus:border-amber-500`}
                 name="bairro" 
                 type="text"
                 value={formData.bairro}
@@ -177,7 +192,7 @@ const Secretaria = () => {
             <div className="col-span-1 sm:col-span-2 flex flex-col gap-1.5">
               <label className="text-xs font-bold uppercase tracking-wide text-zinc-400">Cidade</label>
               <input
-                className={`w-full bg-black border ${formData.cidade === '' ? 'border-red-900' : 'border-emerald-900'} p-3 text-white outline-none transition-colors uppercase rounded-xl text-sm focus:border-amber-500`}
+                className={`w-2/3 bg-black border ${formData.cidade === '' ? 'border-red-900' : 'border-emerald-900'} p-3 text-white outline-none transition-colors uppercase rounded-xl text-sm focus:border-amber-500`}
                 name="cidade" 
                 type="text"
                 value={formData.cidade}
@@ -189,7 +204,7 @@ const Secretaria = () => {
             <div className="col-span-1 sm:col-span-2 flex flex-col gap-1.5">
               <label className="text-xs font-bold uppercase tracking-wide text-zinc-400">Celular</label>
               <input
-                className={`w-full bg-black border ${formData.tel1 === '' ? 'border-red-900' : 'border-emerald-900'} p-3 text-white outline-none transition-colors uppercase rounded-xl text-sm focus:border-amber-500`}
+                className={`w-auto bg-black border ${formData.tel1 === '' ? 'border-red-900' : 'border-emerald-900'} p-3 text-white outline-none transition-colors uppercase rounded-xl text-sm focus:border-amber-500`}
                 name="tel1" 
                 type="text"
                 value={formData.tel1}
